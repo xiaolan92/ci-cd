@@ -44,7 +44,7 @@
   
   -d  后台运行容器，并返回容器ID
   
-  -p 3000:80  将容器内80端口映射至宿主机9980端口，这是访问gitlab的端口
+  -p 3000:80  将容器内80端口映射至宿主机3000端口，这是访问gitlab的端口
   
   -p 9922:22  将容器内22端口映射至宿主机9922端口，这是访问ssh的端口
   
@@ -69,11 +69,13 @@
   vi /etc/gitlab/gitlab.rb
   ## 加入如下
   # gitlab访问地址，可以写域名。如果端口不写的话默认为80端口
-  external_url 'http://101.133.225.166'
+  external_url 'http://101.133.225.166:3000'
   # ssh主机ip
   gitlab_rails['gitlab_ssh_host'] = '101.133.225.166'
   # ssh连接端口
   gitlab_rails['gitlab_shell_ssh_port'] = 9922
+  #更改nginx端口
+  nginx["listen_port"]= 80
   
   # 让配置生效
   gitlab-ctl reconfigure
@@ -113,3 +115,49 @@
   ```
 
   附: [gitlab 官方安装文档](https://docs.gitlab.cn/jh/install/docker.html)
+
+
+
+***
+
+* **安装及部署Jenkins**
+
+  ```
+  docker pull jenkins/jenkins:lts-jdk11
+  ```
+
+  附:[jenkins官方镜像](https://hub.docker.com/r/jenkins/jenkins)
+
+   ```
+   sudo mkdir -p /var/jenkins
+   ```
+
+```
+sudo chmod 777 /var/jenkins
+```
+
+```
+docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins:/var/jenkins_home -v /etc/localtime:/etc/localtime --name myjenkins jenkins/jenkins:lts-jdk11
+```
+
+  **jenkins 插件安装**:
+
+​    ***git parameter***      # 作用是从gitlab拉取代码
+
+  ***Role-based Authorization Strategy***   # 作用是jenkins的权限管理(安装后在全局安全配置的授权策略选项中选择它)
+
+***GitLab Plugin***   # This plugin allows [GitLab](http://gitlab.com/) to trigger Jenkins builds and display their results in the GitLab UI.(gitlab提交代码Jenkins自动打包发布)
+
+注意:  1.在安装 GitLab Plugin 后在相应的项目的 构建触发器中 选择相应的选项;
+
+​           2.在gitlab 总的设置(不是项目的设置)中 选择 **网络** 的 **出站请求**  然后 *Allow requests to the local network from webhooks and integrations*  这个选项选中保存.
+
+​         3.在gitlab 某个项目的**设置**中选择 **Webhooks**，并填写和选择相应选项(url填写为jenkins **触发构建器** 选项中的地址)
+
+​        4.在Jenkins 的**系统管理** 的 **gitlab** 中去掉 *Enable authentication for '/project' end-point*  选项
+
+   
+
+   然后就可以做到gitlab提交代码jenkins自动构建发布了。
+
+附:[参考视频](https://www.bilibili.com/video/BV1pF411Y7tq?p=33&vd_source=ee5c1fe08cb3fe64aaa4063de52804c4)
