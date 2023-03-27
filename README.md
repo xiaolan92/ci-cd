@@ -137,7 +137,7 @@ sudo chmod 777 /var/jenkins
 ```
 
 ```
-docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins:/var/jenkins_home -v /etc/localtime:/etc/localtime --name myjenkins jenkins/jenkins:lts-jdk11
+docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins:/var/jenkins_home -v /etc/localtime:/etc/localtime -v /var/run/docker.sock:/var/run/docker.sock  --name myjenkins jenkins/jenkins:lts-jdk11
 ```
 
   **jenkins 插件安装**:
@@ -161,3 +161,10 @@ docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins:/var/jenkins_home -v 
    然后就可以做到gitlab提交代码jenkins自动构建发布了。
 
 附:[参考视频](https://www.bilibili.com/video/BV1pF411Y7tq?p=33&vd_source=ee5c1fe08cb3fe64aaa4063de52804c4)
+
+
+
+**Jenkins 指定具体的分支进行构建:**
+
+  在项目配置中点击“参数化构建过程”,名称:branch; 参数类型:分支或标签;指定分支(为空时代表any):${branch}  即可
+
