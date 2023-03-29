@@ -168,3 +168,128 @@ docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins:/var/jenkins_home -v 
 
   在项目配置中点击“参数化构建过程”,名称:branch; 参数类型:分支或标签;指定分支(为空时代表any):${branch}  即可
 
+
+
+***
+
+1.**安装及部署Harbor**
+
+   安装 docker-compose
+
+```powershell
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum -y install docker-compose-plugin
+cp /usr/libexec/docker/cli-plugins/docker-compose /usr/bin
+```
+
+**安装 Harbor**
+
+```
+wget  https://github.com/goharbor/harbor/releases/download/v2.4.2/harbor-online-installer-v2.4.2.tgz
+
+tar xvf harbor-online-installer-v2.4.2.tgz -C /usr/local/
+```
+
+```
+
+# harbor配置文件模板
+harbor.yml.tmpl  
+
+# 首次安装需要先执行，会生成docekr-compose.yml文件
+# 更新harbor配置文件后也需要执行此文件
+# ./prepare 
+prepare 
+
+# 安装启动脚本
+install.sh
+
+# 容器启动相关配置文件目录
+common
+
+
+```
+
+
+
+修改相应配置:
+
+修改**harbor.yml.tmpl**文件的相关内容，不需要的需要屏蔽掉
+
+```
+cd /usr/local/harbor/
+cp harbor.yml.tmpl harbor.yml
+vi harbor.yml
+
+###==== 修改以下参数
+
+# 访问域名
+hostname : my.harbor.com  
+
+
+
+# 配置https证书路径
+certificate: /data/cert/my.harbor.com.crt
+private_key: /data/cert/my.harbor.com.key
+
+# 管理员密码
+harbor_admin_password: AdminPassword
+
+database:
+	# 设置pgsql管理员密码
+	password: root123
+
+# 存储路径
+data_volume: /data
+
+```
+
+安装:
+
+```
+# 执行安装脚本
+./install.sh
+```
+
+harbor重启
+
+```
+cd /usr/local/harbor/
+docker-compose restart
+```
+
+```
+// 使用insecure-registries参数添加http支持
+ vim /etc/docker/daemon.json
+{
+  "registry-mirrors": ["https://vpr3xe3f.mirror.aliyuncs.com"],
+  "insecure-registries": ["192.168.92.130:90"]
+}
+ systemctl daemon-reload
+ systemctl restart docker
+```
+
+登陆
+
+```
+docker login 192.168.92.130:90
+```
+
+推送镜像包到私有仓库:
+
+```
+docker pull nginx
+ // 远程有linux13这个镜像仓库(harbor地址/目录/镜像名:版本)
+docker tag nginx:latest 192.168.92.130:90/linux13/nginx:1.21.1
+docker images
+
+docker push 192.168.92.130:90/linux13/nginx:1.21.1
+```
+
+下载镜像:
+
+```
+// 需登陆
+docker pull 192.168.92.130:90/linux13/nginx:1.21.1
+```
+
