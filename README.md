@@ -123,22 +123,116 @@
 * **安装及部署Jenkins**
 
   ```
-  docker pull jenkins/jenkins:lts-jdk11
+  yum -y install java-11-openjdk
+  wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo --no-check-certificate
+  rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+  yum install jenkins
+  systemctl daemon-reload
+  systemctl start jenkins
+  systemctl enable jenkins
+  
   ```
+  
+  * **安装git**
+  
+    ```
+    yum install -y git
+    
+    # 查看版本
+    git version
+    
+    # 查看git目录路径
+    which git
+    ```
+  
+    **然后找到Jenkins下的系统管理-全局工具配置-Git**
+  
+    **将上面复制的git的路径放在Path to Git executable中**
+  
+    
+  
+    **问题：** 
+  
+    ​    在Jenkins里使用docker build 打包镜像的时候出现了Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "/library/node:16-alpine-base/json": dial unix /var/run/docker.sock: connect: permission denied
+  
+    将jenkins所用的用户添加到docker用户组中
+  
+    
+  
+    1、查看当前docker用户组都有谁。
+  
+    cat /etc/group | grep docker
+  
+    
+  
+    2、将当前用户添加到docker组中。
+  
+    usermod -a -G docker jenkins
+  
+    
+  
+    3、更新用户组
+  
+    newgrp docker
+  
+    
+  
+    4、chmod 777 /var/run/docker.sock
 
-  附:[jenkins官方镜像](https://hub.docker.com/r/jenkins/jenkins)
+##### 问题:
 
-   ```
-   sudo mkdir -p /var/jenkins
-   ```
+#####       Jenkins中提示Host key verification failed解决办法
 
 ```
-sudo chmod 777 /var/jenkins
+[root@localhost ~]# grep "jenkins" /etc/passwd
+jenkins:x:988:983:Jenkins Automation Server:/var/lib/jenkins:/bin/false
 ```
 
+ 变为:
+
 ```
-docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins:/var/jenkins_home -v /etc/localtime:/etc/localtime -v /var/run/docker.sock:/var/run/docker.sock  --name myjenkins jenkins/jenkins:lts-jdk11
+[root@localhost ~]# vim /etc/passwd
+jenkins:x:988:983:Jenkins Automation Server:/var/lib/jenkins:/bin/bash
 ```
+
+切换jenkins用户 测试
+
+```
+[root@localhost ~]# su jenkins
+bash-4.2$ exit
+exit
+```
+
+重新定义jenkins用户的命令提示符
+
+```
+[root@localhost ~]# vim .bash_profile 
+末行追加
+export PS1='[\u@\h \W]\$ '
+[root@localhost ~]# source .bash_profile 
+```
+
+再次切换到jenkins用户测试
+
+```
+[root@localhost ~]# su jenkins
+[jenkins@localhost root]$ exit
+exit
+```
+
+jenkins用户对目标主机做免密登陆
+
+```
+[root@localhost ~]# su jenkins
+[jenkins@localhost root]$ ssh-keygen -t rsa
+[jenkins@localhost root]$ ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.0.0.41
+
+# 验证
+ssh 'root@10.0.0.41'
+
+```
+
+
 
   **jenkins 插件安装**:
 
@@ -161,6 +255,10 @@ docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins:/var/jenkins_home -v 
    然后就可以做到gitlab提交代码jenkins自动构建发布了。
 
 附:[参考视频](https://www.bilibili.com/video/BV1pF411Y7tq?p=33&vd_source=ee5c1fe08cb3fe64aaa4063de52804c4)
+
+**nodejs**
+
+**publish over  SSH**
 
 
 
@@ -289,7 +387,6 @@ docker push 192.168.92.130:90/linux13/nginx:1.21.1
 下载镜像:
 
 ```
-// 需登陆
 docker pull 192.168.92.130:90/linux13/nginx:1.21.1
 ```
 
