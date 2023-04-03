@@ -268,6 +268,28 @@ ssh 'root@10.0.0.41'
 
 
 
+```
+#!/bin/bash
+pwd
+docker build -t nginx-agent:$version .
+docker tag nginx-agent:$version 124.221.113.29:90/public/nginx-agent:$version
+docker login 124.221.113.29:90 -u admin -p Harbor12345
+docker push 124.221.113.29:90/public/nginx-agent:$version
+# 推送镜像后删除镜像
+docker rmi nginx-agent:$version
+docker rmi 124.221.113.29:90/public/nginx-agent:$version
+
+ssh root@124.221.113.29 "docker stop nginx-test;docker container rm nginx-test"
+
+# 要删除现有容器未使用的所有镜像
+ssh root@124.221.113.29 "docker image prune -a  --force"
+
+ssh root@124.221.113.29 "docker pull 124.221.113.29:90/public/nginx-agent:$version"
+ssh root@124.221.113.29 "docker run --name nginx-test -p 8001:80 -d 124.221.113.29:90/public/nginx-agent:$version"
+```
+
+
+
 ***
 
 1.**安装及部署Harbor**
