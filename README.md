@@ -412,3 +412,65 @@ docker push 192.168.92.130:90/linux13/nginx:1.21.1
 docker pull 192.168.92.130:90/linux13/nginx:1.21.1
 ```
 
+
+
+***
+
+* centos 安装locate 命令
+
+  ```
+  sudo yum -y install mlocate
+  # 初始化
+  sudo updatedb
+  ```
+
+
+
+***
+
+* Jenkins通过安装ssh插件实现构建后推送到其它服务器(非docker镜像)
+
+   1、在**系统管理** ———>**系统配置**里添加不同的要发布项目的SSH Servers;
+
+  2、在项目**配置**下的**构建后操作**的**添加构建后添加操作**选择**send build artifacts. over SSH**(注意:Transfer Set
+
+Source files下需填写dist/**(2个星号),才能复制dist文件下的目录)
+
+***
+
+* 安装nginx
+
+  ```
+  # 安装所需环境
+  yum install -y gcc-c++   pcre pcre-devel zlib zlib-devel openssl openssl-devel
+  
+  # 官网下载nginx
+  wget -c https://nginx.org/download/nginx-1.22.1.tar.gz
+  
+  tar -zxvf nginx-1.12.1.tar.gz
+  cd nginx-1.12.1
+  
+  # 配置
+  ./configure
+  
+  # 编译安装
+  make
+  make install
+  
+  # 查找安装路径
+  whereis nginx
+  
+  # 启动、停止nginx
+  
+  cd /usr/local/nginx/sbin/
+  ./nginx 
+  ./nginx -s stop
+  ./nginx -s quit
+  ./nginx -s reload
+  
+  
+  
+  ```
+
+  
+
