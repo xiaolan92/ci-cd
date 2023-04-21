@@ -131,6 +131,10 @@
   systemctl start jenkins
   systemctl enable jenkins
   
+  
+  systemctl status jenkins
+  systemctl stop jenkins
+  
   ```
   
   * **安装git**
