@@ -135,6 +135,10 @@
   systemctl status jenkins
   systemctl stop jenkins
   
+  // 查看Jenkins端口
+  
+  ps -ef|grep jenkins
+  
   ```
   
   * **安装git**
