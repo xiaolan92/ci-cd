@@ -475,8 +475,16 @@ Source files下需填写dist/**(2个星号),才能复制dist文件下的目录)
   ./nginx -s stop
   ./nginx -s quit
   ./nginx -s reload
-  
-  
+
+
+  nginx查看log
+
+  cd /var/log/nginx
+
+  tail -f access.log   查看访问日志（access log）
+  tail -f error.log    查看错误日志（error log）
+
+  注意: 具体的日志文件路径可能因为系统和配置不同而有所变化。
   
   ```
 ***
