@@ -500,4 +500,22 @@ Source files下需填写dist/**(2个星号),才能复制dist文件下的目录)
      chown -R  用户名 . 用户组  文件或目录
     ```
   
+***
 
+* 升级websocket协议
+```
+
+location / {
+  	proxy_pass_header Server;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Host $host;
+    proxy_set_header X_Forward_For $proxy_add_x_forwarded_for;
+    proxy_http_version 1.1;
+    // 升级websocket协议
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+		
+    proxy_pass http://127.0.0.1:3939; # 配置转发；将https://notes.jindll.com转发到本机http://127.0.0.1:3939
+  }
+
+```
