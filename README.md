@@ -530,3 +530,6 @@ location / {
   ```
 第一行允许来自 192.168.0.0/24 网段的 IP 地址访问。第二行拒绝其他所有 IP 地址的访问。
 注意：此规则应在其他规则之前执行，以确保其生效。
+***
+[https://blog.csdn.net/macaiyun0629/article/details/131086989](https://blog.csdn.net/macaiyun0629/article/details/131086989)
+[https://juejin.cn/post/7203009064719335461](https://juejin.cn/post/7203009064719335461)
