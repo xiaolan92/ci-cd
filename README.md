@@ -520,7 +520,7 @@ location / {
 
 ```
 ***
-* ptables只允许指定网段ip访问
+* iptables只允许指定网段ip访问
   
   可以使用 iptables 规则限制指定网段的 IP 地址访问。示例如下：
   ```
