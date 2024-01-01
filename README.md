@@ -519,3 +519,14 @@ location / {
   }
 
 ```
+***
+* ptables只允许指定网段ip访问
+  
+  可以使用 iptables 规则限制指定网段的 IP 地址访问。示例如下：
+  ```
+  iptables -A INPUT -s 192.168.0.0/24 -j ACCEPT
+  iptables -A INPUT -j DROP
+
+  ```
+第一行允许来自 192.168.0.0/24 网段的 IP 地址访问。第二行拒绝其他所有 IP 地址的访问。
+注意：此规则应在其他规则之前执行，以确保其生效。
